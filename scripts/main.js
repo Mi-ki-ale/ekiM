@@ -1,1 +1,1 @@
-console.log("yt=@michaeloney0");
+console.log("yt/tiktok=@michaeloney0");
