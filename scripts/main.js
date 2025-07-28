@@ -44,11 +44,6 @@ function checkTrivia() {
     saveVotes(votes);
     showPercentages();
 
-    if (answer.value === "Red/Blue") {
-        result.textContent = "Correct! Pokémon Red/Blue was released first.";
-    } else {
-        result.textContent = "Incorrect. The correct answer is Pokémon Red/Blue.";
-    }
 }
 
 // Show percentages on page load
