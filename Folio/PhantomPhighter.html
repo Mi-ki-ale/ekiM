@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phantom Siege</title>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:#050510;
+    font-family:Arial;
+    color:rgb(255, 255, 255);
+}
+
+canvas{
+    display:block;
+    background: radial-gradient(circle at center,#111133,#050510);
+}
+
+#ui{
+    position:absolute;
+    top:10px;
+    left:10px;
+    font-size:18px;
+}
+
+#warning{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:40px;
+    color:red;
+    font-weight:bold;
+    text-shadow:0 0 20px red;
+    pointer-events:none;
+}
+
+#reloadText{
+    position:absolute;
+    top:120px;
+    left:10px;
+    color:orange;
+}
+
+#gameOverScreen{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.9);
+    display:none;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+}
+
+#gameOverScreen h1{
+    font-size:60px;
+    color:red;
+}
+
+button{
+    padding:10px 20px;
+    font-size:20px;
+    margin:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="ui">
+Health: <span id="health">100</span><br>
+Score: <span id="score">0</span><br>
+Ammo: <span id="ammo">20</span>
+</div>
+
+<div id="reloadText"></div>
+<div id="warning"></div>
+
+<div id="gameOverScreen">
+    <h1>GAME OVER</h1>
+    <p id="finalScore"></p>
+    <button onclick="restartGame()">Restart</button>
+    <button onclick="homeGame()">Home</button>
+</div>
+
+<canvas id="game"></canvas>
+
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let score=0;
+let gameOver=false;
+
+let ammo=20;
+let maxAmmo=20;
+let reloading=false;
+
+let keys={};
+let bullets=[];
+let phantoms=[];
+
+const player={
+    x:canvas.width/2,
+    y:canvas.height/2,
+    size:20,
+    speed:5,
+    health:100
+};
+
+let mouse={x:0,y:0};
+
+const healthUI=document.getElementById("health");
+const scoreUI=document.getElementById("score");
+const ammoUI=document.getElementById("ammo");
+const reloadText=document.getElementById("reloadText");
+
+document.addEventListener("keydown",e=>{
+    keys[e.key.toLowerCase()]=true;
+    if(e.key.toLowerCase()==="r") reload();
+});
+
+document.addEventListener("keyup",e=>{
+    keys[e.key.toLowerCase()]=false;
+});
+
+canvas.addEventListener("mousemove",e=>{
+    mouse.x=e.clientX;
+    mouse.y=e.clientY;
+});
+
+canvas.addEventListener("click",shoot);
+
+function shoot(){
+
+    if(gameOver || reloading) return;
+    if(ammo<=0) return;
+
+    ammo--;
+    ammoUI.textContent=ammo;
+
+    const angle=Math.atan2(mouse.y-player.y,mouse.x-player.x);
+
+    bullets.push({
+        x:player.x,
+        y:player.y,
+        dx:Math.cos(angle)*10,
+        dy:Math.sin(angle)*10,
+        size:5
+    });
+}
+
+function reload(){
+
+    if(reloading || ammo===maxAmmo || gameOver) return;
+
+    reloading=true;
+    reloadText.textContent="Reloading...";
+
+    setTimeout(()=>{
+        ammo=maxAmmo;
+        ammoUI.textContent=ammo;
+        reloading=false;
+        reloadText.textContent="";
+    },1500);
+}
+
+function spawnPhantom(){
+
+    let side=Math.floor(Math.random()*4);
+    let x,y;
+
+    if(side===0){x=Math.random()*canvas.width;y=-50;}
+    if(side===1){x=canvas.width+50;y=Math.random()*canvas.height;}
+    if(side===2){x=Math.random()*canvas.width;y=canvas.height+50;}
+    if(side===3){x=-50;y=Math.random()*canvas.height;}
+
+    phantoms.push({
+        x,y,
+        size:25,
+        speed:1+Math.random()*2,
+        phase:Math.random()>0.5,
+        visible:true,
+        phaseTimer:0
+    });
+}
+
+setInterval(spawnPhantom,1000);
+
+function update(){
+
+    if(gameOver) return;
+
+    if(keys["w"]) player.y-=player.speed;
+    if(keys["s"]) player.y+=player.speed;
+    if(keys["a"]) player.x-=player.speed;
+    if(keys["d"]) player.x+=player.speed;
+
+    let speedMult=score>=500?2:1;
+    let phaseMult=score>=500?2:1;
+
+    bullets.forEach((b,i)=>{
+        b.x+=b.dx;
+        b.y+=b.dy;
+        if(b.x<0||b.x>canvas.width||b.y<0||b.y>canvas.height) bullets.splice(i,1);
+    });
+
+    phantoms.forEach((p,pi)=>{
+
+        let angle=Math.atan2(player.y-p.y,player.x-p.x);
+
+        p.x+=Math.cos(angle)*p.speed*speedMult;
+        p.y+=Math.sin(angle)*p.speed*speedMult;
+
+        if(p.phase){
+            p.phaseTimer+=phaseMult;
+            if(p.phaseTimer>120){
+                p.visible=!p.visible;
+                p.phaseTimer=0;
+            }
+        }
+
+        bullets.forEach((b,bi)=>{
+            let dx=b.x-p.x;
+            let dy=b.y-p.y;
+            if(Math.sqrt(dx*dx+dy*dy)<p.size+b.size && p.visible){
+                bullets.splice(bi,1);
+                phantoms.splice(pi,1);
+                score+=10;
+                scoreUI.textContent=score;
+            }
+        });
+
+        let dx=player.x-p.x;
+        let dy=player.y-p.y;
+
+        if(Math.sqrt(dx*dx+dy*dy)<player.size+p.size){
+
+            player.health-=0.3;
+            healthUI.textContent=Math.floor(player.health);
+
+            if(player.health<=0 && !gameOver){
+                gameOver=true;
+                document.getElementById("finalScore").textContent="Score: "+score;
+                document.getElementById("gameOverScreen").style.display="flex";
+            }
+        }
+    });
+
+    document.getElementById("reloadText").textContent =
+        reloading ? "Reloading..." : "";
+
+    if(score>=500 && !window.warned){
+        window.warned=true;
+        document.getElementById("warning").textContent="THE PHANTOMS HAVE EVOLVED!";
+        setTimeout(()=>{
+            document.getElementById("warning").textContent="";
+        },3000);
+    }
+}
+
+function draw(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    ctx.save();
+    let angle=Math.atan2(mouse.y-player.y,mouse.x-player.x);
+    ctx.translate(player.x,player.y);
+    ctx.rotate(angle);
+
+    ctx.fillStyle="cyan";
+    ctx.beginPath();
+    ctx.moveTo(25,0);
+    ctx.lineTo(-15,-12);
+    ctx.lineTo(-15,12);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.fillStyle="yellow";
+    bullets.forEach(b=>{
+        ctx.beginPath();
+        ctx.arc(b.x,b.y,b.size,0,Math.PI*2);
+        ctx.fill();
+    });
+
+    phantoms.forEach(p=>{
+        ctx.globalAlpha=p.visible?1:0.2;
+        ctx.fillStyle="white";
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+        ctx.fill();
+        ctx.globalAlpha=1;
+    });
+}
+
+function loop(){
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+loop();
+
+function restartGame(){
+    location.reload();
+}
+
+function homeGame(){
+    location.reload();
+}
+</script>
+
+</body>
+</html>

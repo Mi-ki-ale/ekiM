@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Michael's Portfolio</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#0b1020;
+    color:white;
+    overflow-x:hidden;
+}
+
+/* Navigation */
+nav{
+    position:fixed;
+    top:0;
+    width:100%;
+    background:rgba(0,0,0,0.85);
+    backdrop-filter:blur(10px);
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    padding:15px;
+    z-index:1000;
+}
+
+nav a{
+    color:#00eaff;
+    text-decoration:none;
+    font-weight:bold;
+    transition:.3s;
+}
+
+nav a:hover{
+    color:white;
+    text-shadow:0 0 10px #00eaff;
+}
+
+/* Hero */
+.hero{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:20px;
+    background:
+    radial-gradient(circle at top,#1f2b5f,#0b1020);
+}
+
+.hero h1{
+    font-size:4rem;
+    color:#00eaff;
+    text-shadow:0 0 20px #00eaff;
+}
+
+.hero p{
+    margin-top:15px;
+    max-width:700px;
+    font-size:1.2rem;
+    color:#ccc;
+}
+
+.hero button{
+    margin-top:25px;
+    padding:15px 35px;
+    border:none;
+    border-radius:30px;
+    background:#00eaff;
+    color:#000;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.hero button:hover{
+    transform:scale(1.1);
+    box-shadow:0 0 20px #00eaff;
+}
+
+/* Sections */
+section{
+    padding:100px 10%;
+}
+
+.section-title{
+    text-align:center;
+    font-size:2.5rem;
+    margin-bottom:40px;
+    color:#00eaff;
+}
+
+/* About */
+.about{
+    background:#11182f;
+    border-radius:20px;
+    padding:40px;
+    line-height:1.8;
+}
+
+/* Skills */
+.skills{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:15px;
+}
+
+.skill{
+    padding:12px 25px;
+    background:#1d2a4d;
+    border:1px solid #00eaff;
+    border-radius:30px;
+}
+
+/* Games */
+.games-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:25px;
+}
+
+.game-card{
+    background:#11182f;
+    border-radius:20px;
+    overflow:hidden;
+    transition:.3s;
+    border:1px solid transparent;
+}
+
+.game-card:hover{
+    transform:translateY(-10px);
+    border-color:#00eaff;
+    box-shadow:0 0 25px rgba(0,234,255,.4);
+}
+
+.game-img{
+    height:180px;
+    background:linear-gradient(45deg,#00eaff,#4d6dff);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:3rem;
+}
+
+.game-content{
+    padding:20px;
+}
+
+.game-content h3{
+    margin-bottom:10px;
+}
+
+.play-btn{
+    display:inline-block;
+    margin-top:15px;
+    padding:10px 20px;
+    background:#00eaff;
+    color:black;
+    text-decoration:none;
+    border-radius:25px;
+    font-weight:bold;
+}
+
+/* Contact */
+.contact{
+    text-align:center;
+}
+
+.contact a{
+    color:#00eaff;
+    text-decoration:none;
+}
+
+/* Footer */
+footer{
+    text-align:center;
+    padding:30px;
+    background:#050814;
+    color:#888;
+}
+
+/* Scroll Animation */
+.hidden{
+    opacity:0;
+    transform:translateY(40px);
+    transition:all .8s ease;
+}
+
+.show{
+    opacity:1;
+    transform:translateY(0);
+}
+
+@media(max-width:768px){
+.hero h1{
+font-size:2.8rem;
+}
+}
+</style>
+</head>
+<body>
+
+<nav>
+<a href="#about">About</a>
+<a href="#skills">Skills</a>
+<a href="#games">Games</a>
+<a href="#contact">Contact</a>
+</nav>
+
+<section class="hero">
+<h1>Michael's Portfolio</h1>
+<p>
+Game Creator • Web Developer • Creative Builder
+</p>
+
+<button onclick="document.getElementById('games').scrollIntoView({behavior:'smooth'})">
+View My Games
+</button>
+</section>
+
+<section id="about" class="hidden">
+<h2 class="section-title">About Me</h2>
+
+<div class="about">
+<p>
+Hello! I'm Michael, a creator who enjoys building browser games,
+interactive experiences, and creative web projects.
+</p>
+
+<br>
+
+<p>
+I enjoy experimenting with JavaScript, designing game mechanics,
+and creating fun projects that people can play directly in their browser.
+</p>
+
+<br>
+
+<p>
+My goal is to continue learning programming while creating bigger and
+better games.
+</p>
+</div>
+</section>
+
+<section id="skills" class="hidden">
+<h2 class="section-title">Skills</h2>
+
+<div class="skills">
+<div class="skill">HTML</div>
+<div class="skill">CSS</div>
+<div class="skill">JavaScript</div>
+<div class="skill">Game Design</div>
+<div class="skill">UI Design</div>
+<div class="skill">Problem Solving</div>
+<div class="skill">Creative Development</div>
+</div>
+</section>
+
+<section id="games" class="hidden">
+<h2 class="section-title">My Games</h2>
+
+<div class="games-grid">
+
+<div class="game-card">
+<div class="game-img">👻</div>
+<div class="game-content">
+<h3>Phantom Phighter</h3>
+<p>
+Battle evolving phantoms and survive increasingly difficult waves.
+</p>
+<a href="PhantomPhighter.html" class="play-btn">Play Game</a>
+</div>
+</div>
+
+<div class="game-card">
+<div class="game-img">⏳</div>
+<div class="game-content">
+<h3>Timekeeper TCG</h3>
+<p>
+Collect powerful cards and battle using special abilities.
+</p>
+<a href="TimeKeeperCardGame2.0.html" class="play-btn">Play Game</a>
+</div>
+</div>
+
+<div class="game-card">
+<div class="game-img">🐍</div>
+<div class="game-content">
+<h3>Snike</h3>
+<p>
+My version of the classic snake game with sound and effects.
+</p>
+<a href="SaveSnake2.0(Sound).html" class="play-btn">Play Game</a>
+</div>
+</div>
+
+<div class="game-card">
+<div class="game-img">🕰️</div>
+<div class="game-content">
+<h3>Time Machine Simulator</h3>
+<p>
+Travel through history while protecting timeline stability.
+</p>
+<a href="TimeMachineGame.html" class="play-btn">Play Game</a>
+</div>
+</div>
+
+<div class="game-card">
+<div class="game-img">🏓</div>
+<div class="game-content">
+<h3>Pang</h3>
+<p>
+My pong game
+</p>
+<a href="SavePong.html" class="play-btn">Play Game</a>
+</div>
+</div>
+
+<div class="game-card">
+<div class="game-img">🚪</div>
+<div class="game-content">
+<h3>Escape Room</h3>
+<p>
+    Get the artifact from chronos.exe (one time play)
+</p>
+<a href="EscapeRoom.html" class="play-btn">Play Game</a>
+</div>
+</div>
+</section>
+
+<section id="contact" class="hidden">
+<h2 class="section-title">Contact</h2>
+
+<div class="contact">
+<p>Email: Bryanmichaeloney@gmail.com</p>
+<br>
+<p>Discord: mich_jil</p>
+<br>
+<p>
+<a href="https://www.youtube.com/@michaeloney0" target="_blank">YouTube</a>
+</p>
+</div>
+</section>
+
+<footer>
+© 2026 Michael Portfolio | Built With HTML, CSS & JavaScript
+</footer>
+
+<script>
+const observer = new IntersectionObserver(entries=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){
+entry.target.classList.add("show");
+}
+});
+});
+
+document.querySelectorAll(".hidden").forEach(el=>{
+observer.observe(el);
+});
+
+</script>
+
+<div class="game-list">
+<a class="game-button" href="CommandCenter.html">Command Center</a>
+<a class="game-button" href="PhantomPhighter.html">Phantom Phighter</a>
+<a class="game-button" href="TimeKeeperCardGame2.0.html">Timekeeper TCG</a>
+<a class="game-button" href="SaveSnake2.0(Sound).html">Snike</a>
+<a class="game-button" href="TimeMachineGame.html">Time Machine Simulator</a>
+<a class="game-button" href="SavePong.html">Pang</a>
+<a class="game-button" href="EscapeRoom.html">Escape Room</a>
+</div>
+
+</body>
+</html>

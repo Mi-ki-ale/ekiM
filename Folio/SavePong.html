@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>2 Player Pong Game</title>
+
+<style>
+/* =========================
+   BASIC PAGE STYLING
+========================= */
+body {
+    margin: 0;
+    background: #0b0f1a;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+/* Game title */
+h1 {
+    margin-top: 20px;
+}
+
+/* Game canvas */
+canvas {
+    background: #111;
+    display: block;
+    margin: 20px auto;
+    border: 2px solid #00ffcc;
+}
+
+/* Scoreboard */
+.score {
+    font-size: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🏓 Pong Game</h1>
+<div class="score">
+    Player 1: <span id="score1">0</span> | Player 2: <span id="score2">0</span>
+</div>
+
+<canvas id="game" width="600" height="400"></canvas>
+
+<script>
+/* =========================
+   CANVAS SETUP
+========================= */
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+/* =========================
+   GAME OBJECTS
+========================= */
+
+// Paddle size
+const paddleWidth = 10;
+const paddleHeight = 80;
+
+// Player paddles
+let player1 = {
+    x: 10,
+    y: 160,
+    score: 0
+};
+
+let player2 = {
+    x: 580,
+    y: 160,
+    score: 0
+};
+
+// Ball
+let ball = {
+    x: 300,
+    y: 200,
+    radius: 8,
+    dx: 4,
+    dy: 4
+};
+
+/* =========================
+   KEYBOARD CONTROLS
+========================= */
+let keys = {};
+
+document.addEventListener("keydown", (e) => {
+    keys[e.key] = true;
+});
+
+document.addEventListener("keyup", (e) => {
+    keys[e.key] = false;
+});
+
+/* =========================
+   GAME LOOP
+========================= */
+function update() {
+
+    /* Move Player 1 (W/S keys) */
+    if (keys["w"]) player1.y -= 6;
+    if (keys["s"]) player1.y += 6;
+
+    /* Move Player 2 (Arrow keys) */
+    if (keys["ArrowUp"]) player2.y -= 6;
+    if (keys["ArrowDown"]) player2.y += 6;
+
+    /* Keep paddles inside screen */
+    player1.y = Math.max(0, Math.min(canvas.height - paddleHeight, player1.y));
+    player2.y = Math.max(0, Math.min(canvas.height - paddleHeight, player2.y));
+
+    /* Move ball */
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+
+    /* Ball collision with top and bottom walls */
+    if (ball.y <= 0 || ball.y >= canvas.height) {
+        ball.dy *= -1;
+    }
+
+    /* Ball collision with paddles */
+    if (
+        ball.x <= player1.x + paddleWidth &&
+        ball.y >= player1.y &&
+        ball.y <= player1.y + paddleHeight
+    ) {
+        ball.dx *= -1;
+    }
+
+    if (
+        ball.x >= player2.x - paddleWidth &&
+        ball.y >= player2.y &&
+        ball.y <= player2.y + paddleHeight
+    ) {
+        ball.dx *= -1;
+    }
+
+    /* Scoring system */
+   if (ball.x < 10) {
+    player2.score++;
+    checkWin();
+    resetBall();
+}
+
+if (ball.x > canvas.width) {
+    player1.score++;
+    checkWin();
+    resetBall();
+
+}
+function checkWin() {
+    if (player1.score >= 10) {
+        gameOver = true;
+        alert("🏆 Player 1 wins!");
+    }
+
+    if (player2.score >= 10) {
+        gameOver = true;
+        alert("🏆 Player 2 wins!");
+    }
+}
+
+    /* Update score display */
+    document.getElementById("score1").textContent = player1.score;
+    document.getElementById("score2").textContent = player2.score;
+
+    draw();
+    requestAnimationFrame(update);
+}
+
+/* =========================
+   DRAW EVERYTHING
+========================= */
+function draw() {
+    // Clear screen
+    ctx.fillStyle = "#111";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw paddles
+    ctx.fillStyle = "#00ffcc";
+    ctx.fillRect(player1.x, player1.y, paddleWidth, paddleHeight);
+    ctx.fillRect(player2.x, player2.y, paddleWidth, paddleHeight);
+
+    // Draw ball
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "white";
+    ctx.fill();
+}
+
+/* =========================
+   RESET BALL AFTER SCORE
+========================= */
+function resetBall() {
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height / 2;
+
+    // Reverse direction randomly
+    ball.dx = -ball.dx;
+    ball.dy = 4 * (Math.random() > 0.5 ? 1 : -1);
+}
+
+/* Start game */
+update();
+</script>
+
+</body>

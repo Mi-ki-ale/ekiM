@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Timekeeper TCG - Powers Update</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: radial-gradient(#111, #000);
+    color: white;
+    text-align: center;
+}
+
+h1 { color: #00ffd5; }
+
+#game {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.player {
+    width: 45%;
+    border: 2px solid #00ffd5;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(0,255,213,0.05);
+}
+
+.card {
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    box-shadow: 0 0 10px #00ffd5;
+}
+
+.art { font-size: 40px; }
+
+button {
+    padding: 10px;
+    margin: 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #00ffd5;
+    font-weight: bold;
+}
+
+button:hover { background: #00bba3; }
+
+#log {
+    height: 150px;
+    overflow-y: auto;
+    background: #111;
+    margin: 10px;
+    padding: 10px;
+    border-top: 2px solid #00ffd5;
+    text-align: left;
+}
+</style>
+</head>
+<body>
+
+<h1>⏳ Timekeeper TCG (Power Update)</h1>
+
+<div id="game">
+
+<div class="player">
+<h2>Player 1</h2>
+<div id="card1"></div>
+<h3>HP: <span id="hp1">30</span></h3>
+<button onclick="attack(1)">Attack</button>
+<button onclick="drawCard(1)">Draw</button>
+<button onclick="usePower(1)">Use Power</button>
+</div>
+
+<div class="player">
+<h2>Player 2</h2>
+<div id="card2"></div>
+<h3>HP: <span id="hp2">30</span></h3>
+<button onclick="attack(2)">Attack</button>
+<button onclick="drawCard(2)">Draw</button>
+<button onclick="usePower(2)">Use Power</button>
+</div>
+
+</div>
+
+<div id="log"></div>
+
+<script>
+const rarities = ["Common", "Rare", "Epic", "Legendary"];
+const powers = [
+    "Time Freeze",
+    "Chrono Shield",
+    "Future Sight",
+    "Time Warp",
+    "Paradox Strike",
+    "Rewind Heal"
+];
+
+const arts = ["⌛","⏳","🕰️","⚡","🌌","🌀","🔮"];
+
+let player1 = { hp: 30, card: null, shield: 0, cooldown: 0 };
+let player2 = { hp: 30, card: null, shield: 0, cooldown: 0 };
+
+function log(msg){
+    document.getElementById("log").innerHTML += msg + "<br>";
+    document.getElementById("log").scrollTop = 9999;
+}
+
+function randomCard(){
+    return {
+        name: "Time Card " + Math.floor(Math.random()*1000),
+        attack: Math.floor(Math.random()*10)+1,
+        defense: Math.floor(Math.random()*10)+1,
+        rarity: rarities[Math.floor(Math.random()*rarities.length)],
+        power: powers[Math.floor(Math.random()*powers.length)],
+        art: arts[Math.floor(Math.random()*arts.length)]
+    };
+}
+
+function render(p){
+    let player = p===1 ? player1 : player2;
+    let el = document.getElementById("card"+p);
+
+    if(!player.card){
+        el.innerHTML = "<p>No card</p>";
+        return;
+    }
+
+    let c = player.card;
+
+    el.innerHTML = `
+    <div class="card">
+        <div class="art">${c.art}</div>
+        <h3>${c.name}</h3>
+        <p><b>ATK:</b> ${c.attack}</p>
+        <p><b>DEF:</b> ${c.defense}</p>
+        <p><b>Rarity:</b> ${c.rarity}</p>
+        <p><b>Power:</b> ${c.power}</p>
+    </div>`;
+}
+
+function drawCard(p){
+    let player = p===1 ? player1 : player2;
+    player.card = randomCard();
+    render(p);
+    log("Player "+p+" drew a card.");
+}
+
+/* ---------- ATTACK ---------- */
+function attack(p){
+    let attacker = p===1 ? player1 : player2;
+    let defender = p===1 ? player2 : player1;
+    let defId = p===1 ? 2 : 1;
+
+    if(!attacker.card) return;
+
+    let dmg = attacker.card.attack - defender.card.defense;
+    if(dmg < 0) dmg = 0;
+
+    if(defender.shield > 0){
+        log("Shield absorbed damage!");
+        defender.shield--;
+        dmg = 0;
+    }
+
+    defender.hp -= dmg;
+    document.getElementById("hp"+defId).innerText = defender.hp;
+
+    log(`Player ${p} dealt ${dmg} damage!`);
+
+    if(defender.hp <= 0){
+        alert("Player "+p+" wins!");
+        location.reload();
+    }
+}
+
+/* ---------- POWER SYSTEM ---------- */
+function usePower(p){
+    let user = p===1 ? player1 : player2;
+    let enemy = p===1 ? player2 : player1;
+
+    if(!user.card){
+        log("No card to use power!");
+        return;
+    }
+
+    if(user.cooldown > 0){
+        log("Power on cooldown!");
+        return;
+    }
+
+    let power = user.card.power;
+    log("Player "+p+" used "+power+"!");
+
+    switch(power){
+
+        case "Time Freeze":
+            enemy.cooldown = 1;
+            log("Enemy loses next power turn!");
+            break;
+
+        case "Chrono Shield":
+            user.shield = 2;
+            log("Shield activated (blocks 2 attacks)!");
+            break;
+
+        case "Future Sight":
+            user.hp += 3;
+            log("Healed 3 HP!");
+            break;
+
+        case "Time Warp":
+            user.card.attack += 3;
+            log("Attack boosted!");
+            break;
+
+        case "Paradox Strike":
+            enemy.hp -= 4;
+            log("Direct damage 4!");
+            break;
+
+        case "Rewind Heal":
+            user.hp += 6;
+            log("Big heal activated!");
+            break;
+    }
+
+    user.cooldown = 1;
+}
+
+/* cooldown tick */
+setInterval(()=>{
+    if(player1.cooldown>0) player1.cooldown--;
+    if(player2.cooldown>0) player2.cooldown--;
+}, 3000);
+
+/* start */
+drawCard(1);
+drawCard(2);
+</script>

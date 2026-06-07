@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Chronos.exe Escape Room</title>
+<style>
+    .hint {
+    color: #ffff66;
+    margin-top: 10px;
+    display: none;
+}
+    body {
+        margin: 0;
+        background: radial-gradient(#0b0f1a, #000);
+        color: #00ffcc;
+        font-family: monospace;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    #game {
+        width: 90%;
+        max-width: 800px;
+        border: 2px solid #00ffcc;
+        padding: 20px;
+        box-shadow: 0 0 20px #00ffcc;
+    }
+
+    h1 {
+        text-align: center;
+        color: #ff0055;
+    }
+
+    .screen {
+        display: none;
+    }
+
+    .active {
+        display: block;
+    }
+
+    button {
+        background: #00ffcc;
+        border: none;
+        padding: 10px;
+        margin-top: 10px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    input {
+        padding: 8px;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .log {
+        background: #111;
+        padding: 10px;
+        height: 150px;
+        overflow-y: auto;
+        margin-top: 10px;
+        border: 1px solid #00ffcc;
+    }
+
+    .warning {
+        color: #ff0055;
+    }
+</style>
+</head>
+<body>
+
+<div id="game">
+
+<h1>CHRONOS.EXE ESCAPE ROOM</h1>
+
+<div id="intro" class="screen active">
+    <p>Chronos.exe has stolen the Temporal Artifact.</p>
+    <p>You must solve 5 security puzzles to retrieve it before time collapses.</p>
+    <button onclick="startGame()">Enter System</button>
+</div>
+
+<!-- PUZZLE 1 -->
+<div id="puzzle1" class="screen">
+    <p><b>Puzzle 1:</b> Break the access code</p>
+    <p>Hint: What is 3 + 7 × 2?</p>
+
+    <input id="p1">
+
+    <button onclick="check1()">Submit</button>
+    <button onclick="showHint('h1')">Request Hint</button>
+
+    <p id="h1" class="hint">Remember order of operations (multiplication first).</p>
+</div>
+
+<!-- PUZZLE 2 -->
+<div id="puzzle2" class="screen">
+    <p><b>Puzzle 2:</b> Decode binary</p>
+    <p>What is binary 01000001 in ASCII?</p>
+    <p id="h2" class="hint">Binary 01000001 converts to a letter using ASCII.</p>
+    <input id="p2">
+    <button onclick="check2()">Submit</button>
+    <button onclick="showHint('h2')">Request Hint</button>
+</div>
+
+<!-- PUZZLE 3 -->
+<div id="puzzle3" class="screen">
+    <p><b>Puzzle 3:</b> Memory fragment</p>
+    <p>Chronos stores passwords as reversed words.</p>
+    <p id="h3" class="hint">Reverse the word backward to find the answer.</p>
+    <p>Decode: "emit"</p>
+    <input id="p3">
+    <button onclick="check3()">Submit</button>
+    <button onclick="showHint('h3')">Request Hint</button>
+</div>
+
+<!-- PUZZLE 4 -->
+<div id="puzzle4" class="screen">
+    <p><b>Puzzle 4:</b> Pattern lock</p>
+    <p>What comes next: 2, 4, 8, 16, ?</p>
+    <p id="h4" class="hint">Each number doubles.</p>
+    <input id="p4">
+    <button onclick="check4()">Submit</button>
+    <button onclick="showHint('h4')">Request Hint</button>
+</div>
+
+<!-- PUZZLE 5 -->
+<div id="puzzle5" class="screen">
+    <p><b>Puzzle 5:</b> Final Firewall</p>
+    <p>Enter the system override keyword:</p>
+    <p class="warning">Hint: The artifact controls time itself</p>
+    <p id="h5" class="hint">It’s the name of the system controlling time.</p>
+    <input id="p5">
+    <button onclick="check5()">Submit</button>
+    <button onclick="showHint('h5')">Request Hint</button>
+</div>
+
+<!-- END -->
+<div id="end" class="screen">
+    <h2>ACCESS GRANTED</h2>
+    <p>You retrieved the Temporal Artifact from Chronos.exe.</p>
+    <p>Time stability restored... for now.</p>
+    <button onclick="restart()">Play Again</button>
+</div>
+
+<div class="log" id="log"></div>
+
+</div>
+
+<script>
+    function showHint(id){
+    document.getElementById(id).style.display = "block";
+    log("Hint requested.");
+}
+function log(msg){
+    document.getElementById("log").innerHTML += msg + "<br>";
+}
+
+function show(id){
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+}
+
+/* GAME FLOW */
+function startGame(){
+    log("Connecting to Chronos.exe...");
+    setTimeout(()=>{
+        log("Firewall bypassed.");
+        show("puzzle1");
+    }, 800);
+}
+
+/* PUZZLE 1 */
+function check1(){
+    let val = document.getElementById("p1").value.trim();
+    if(val == "17"){
+        log("Puzzle 1 solved.");
+        show("puzzle2");
+    } else {
+        log("Incorrect code.");
+    }
+}
+
+/* PUZZLE 2 */
+function check2(){
+    let val = document.getElementById("p2").value.trim().toLowerCase();
+    if(val == "a"){
+        log("Binary decoded.");
+        show("puzzle3");
+    } else {
+        log("Decoding failed.");
+    }
+}
+
+/* PUZZLE 3 */
+function check3(){
+    let val = document.getElementById("p3").value.trim().toLowerCase();
+    if(val == "time"){
+        log("Memory fragment recovered.");
+        show("puzzle4");
+    } else {
+        log("Fragment corrupted.");
+    }
+}
+
+/* PUZZLE 4 */
+function check4(){
+    let val = document.getElementById("p4").value.trim();
+    if(val == "32"){
+        log("Pattern recognized.");
+        show("puzzle5");
+    } else {
+        log("Pattern mismatch.");
+    }
+}
+
+/* PUZZLE 5 */
+function check5(){
+    let val = document.getElementById("p5").value.trim().toLowerCase();
+    if(val == "chronos"){
+        log("Override accepted.");
+        show("end");
+    } else {
+        log("Firewall still active.");
+    }
+}
+
+function restart(){
+    location.reload();
+}
+</script>
+
+</body>
+</html>

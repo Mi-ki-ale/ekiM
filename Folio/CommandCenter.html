@@ -1,0 +1,212 @@
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gamer Command Center</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: radial-gradient(circle at top, #0b0f1a, #000);
+    color: #00ffe1;
+    overflow-x: hidden;
+}
+
+/* HEADER */
+header {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 2px solid #00ffe1;
+    animation: glow 2s infinite alternate;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    letter-spacing: 3px;
+}
+
+header p {
+    opacity: 0.7;
+}
+
+/* GRID */
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* PANEL */
+.panel {
+    background: rgba(0, 255, 225, 0.05);
+    border: 1px solid #00ffe1;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0,255,225,0.2);
+}
+
+/* BUTTONS */
+button {
+    background: black;
+    color: #00ffe1;
+    border: 1px solid #00ffe1;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 6px;
+}
+
+button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #00ffe1;
+}
+
+/* STATUS */
+.status {
+    margin-top: 10px;
+    padding: 10px;
+    border-left: 3px solid #00ffe1;
+}
+
+/* ALERT */
+.alert {
+    background: red;
+    color: white;
+    padding: 10px;
+    margin-top: 10px;
+    animation: flash 0.8s infinite;
+    display: none;
+}
+
+/* ANIMATIONS */
+@keyframes glow {
+    from { text-shadow: 0 0 10px #00ffe1; }
+    to { text-shadow: 0 0 25px #00ffe1; }
+}
+
+@keyframes flash {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+}
+
+/* RESPONSIVE */
+@media(max-width: 800px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1 id="teamName">NEON OPS COMMAND CENTER</h1>
+    <p>Secure Gamer Interface • Live Mission Dashboard</p>
+</header>
+
+<div class="container">
+
+    <!-- MISSION CONTROL -->
+    <div class="panel">
+        <h2>Mission Control</h2>
+        <button onclick="startMission()">Start Mission</button>
+        <button onclick="boost()">Activate Boost</button>
+        <button onclick="alertSystem()">Trigger Alert</button>
+
+        <div class="status" id="statusBox">
+            Status: Idle • Waiting for command
+        </div>
+
+        <div class="alert" id="alertBox">
+            ⚠ SYSTEM ALERT: Intrusion detected!
+        </div>
+    </div>
+
+    <!-- TEAM PANEL -->
+    <div class="panel">
+        <h2>Team Console</h2>
+        <button onclick="changeTeam()">Change Team Name</button>
+        <button onclick="randomMission()">Random Mission</button>
+
+        <div class="status" id="missionBox">
+            Mission: None assigned
+        </div>
+
+        <div class="status">
+            Rank: Elite Operative
+        </div>
+
+        <div class="status">
+            Energy Level: 98%
+        </div>
+    </div>
+
+</div>
+
+<script>
+let missions = [
+    "Infiltrate the Neon Grid",
+    "Defend the Core Server",
+    "Hack the Enemy Firewall",
+    "Rescue Digital Hostage",
+    "Secure Data Package X-77",
+    "Override AI Control System"
+];
+
+
+function startMission() {
+    document.getElementById("statusBox").innerText =
+        "Status: Mission Active • Executing protocol...";
+
+    // Random system failure chance (30%)
+    let glitchChance = Math.random();
+
+    setTimeout(() => {
+        if (glitchChance < 0.3) {
+            document.getElementById("statusBox").innerText =
+                "Status: ⚠ PROTOCOL ERROR — SYSTEM INSTABILITY DETECTED!";
+        } else {
+            document.getElementById("statusBox").innerText =
+                "Status: Mission Running Smoothly ✔";
+        }
+    }, 2000);
+}
+
+function boost() {
+    document.getElementById("statusBox").innerText =
+        "Status: BOOST ACTIVATED ⚡ Reaction speed increased!";
+}
+
+function alertSystem() {
+    const alertBox = document.getElementById("alertBox");
+    alertBox.style.display = "block";
+
+    setTimeout(() => {
+        alertBox.style.display = "none";
+    }, 3000);
+}
+
+function changeTeam() {
+    let name = prompt("Enter new team name:");
+    if (name) {
+        document.getElementById("teamName").innerText = name.toUpperCase() + " COMMAND CENTER";
+    }
+}
+
+function randomMission() {
+    let mission = missions[Math.floor(Math.random() * missions.length)];
+    document.getElementById("missionBox").innerText = "Mission: " + mission;
+}
+</script>
+
+</body>
+</html>

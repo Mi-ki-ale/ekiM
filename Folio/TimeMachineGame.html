@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Time Machine Simulator</title>
+<style>
+    body {
+        margin: 0;
+        background: radial-gradient(circle at top, #1a1a2e, #0d0d17);
+        color: #e0e0ff;
+        font-family: monospace;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+    }
+
+    h1 {
+        margin-top: 20px;
+        color: #7aa2ff;
+    }
+
+    .panel {
+        margin-top: 20px;
+        background: rgba(255,255,255,0.05);
+        padding: 15px;
+        border-radius: 10px;
+        width: 400px;
+        text-align: center;
+        box-shadow: 0 0 15px rgba(122,162,255,0.2);
+    }
+
+    input, button {
+        padding: 10px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        font-family: monospace;
+    }
+
+    button {
+        background: #7aa2ff;
+        color: black;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #9bb8ff;
+    }
+
+    #log {
+        margin-top: 20px;
+        width: 80%;
+        max-width: 700px;
+        height: 300px;
+        overflow-y: auto;
+        background: rgba(0,0,0,0.4);
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #333;
+        font-size: 13px;
+    }
+
+    .danger { color: #ff5c5c; }
+    .ally { color: #5cff9d; }
+    .treasure { color: #ffd35c; }
+    .event { color: #9aa7ff; }
+</style>
+</head>
+<body>
+
+<h1>⏳ Time Machine Simulator</h1>
+
+<div class="panel">
+    <input id="yearInput" type="number" placeholder="Enter Year (e.g. 1920)" />
+    <button onclick="travel()">Travel</button>
+    <button onclick="reset()">Reset Timeline</button>
+    <p>Timeline Stability: <span id="stability">100</span>%</p>
+</div>
+
+<div id="log"></div>
+
+<script>
+let stability = 100;
+
+const events = [
+    "A temporal storm distorts reality",
+    "A historical paradox forms nearby",
+    "A time echo repeats endlessly",
+    "A forgotten civilization appears briefly",
+    "History subtly shifts"
+];
+
+const dangers = [
+    "Rogue time agents are hunting you",
+    "A paradox creature emerges",
+    "Time loop traps nearby area",
+    "Reality fracture expanding",
+    "You are being erased from the timeline"
+];
+
+const allies = [
+    "A time guardian assists you",
+    "A future historian guides you",
+    "A rogue AI from 3020 helps you",
+    "An ancient traveler shares knowledge",
+    "A timeline repair unit arrives"
+];
+
+const treasures = [
+    "Quantum artifact acquired",
+    "Lost technology recovered",
+    "Chrono crystal obtained",
+    "Future data core secured",
+    "Ancient relic stabilized"
+];
+
+function logMessage(text, type="event") {
+    const log = document.getElementById("log");
+    const div = document.createElement("div");
+    div.className = type;
+    div.textContent = text;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+}
+
+function updateStability(amount) {
+    stability += amount;
+    if (stability > 100) stability = 100;
+    if (stability < 0) stability = 0;
+    document.getElementById("stability").textContent = stability;
+
+    if (stability <= 0) {
+        logMessage("💥 TIMELINE COLLAPSE! Reality has been erased.", "danger");
+        document.body.style.background = "black";
+    }
+}
+
+function random(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function travel() {
+    if (stability <= 0) return;
+
+    const year = document.getElementById("yearInput").value;
+    if (!year) return;
+
+    logMessage(`➡️ Traveling to year ${year}...`, "event");
+
+    const eventChance = Math.random();
+
+    logMessage(random(events), "event");
+
+    if (eventChance < 0.4) {
+        logMessage("⚠️ DANGER: " + random(dangers), "danger");
+        updateStability(-20);
+    }
+
+    if (eventChance >= 0.4 && eventChance < 0.7) {
+        logMessage("🤝 ALLY: " + random(allies), "ally");
+        updateStability(+5);
+    }
+
+    if (eventChance >= 0.7) {
+        logMessage("💎 TREASURE: " + random(treasures), "treasure");
+        updateStability(+10);
+    }
+
+    // Small passive instability from time travel
+    updateStability(-5);
+}
+
+function reset() {
+    stability = 100;
+    document.getElementById("stability").textContent = stability;
+    document.getElementById("log").innerHTML = "";
+    document.body.style.background = "radial-gradient(circle at top, #1a1a2e, #0d0d17)";
+    logMessage("🔄 Timeline reset. Time machine stabilized.", "event");
+}
+</script>
+
+</body>
+</html>
