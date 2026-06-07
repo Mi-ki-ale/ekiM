@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phantom Siege</title>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:#050510;
+    color:white;
+    font-family:Arial,sans-serif;
+}
+canvas{
+    display:block;
+    background:
+    radial-gradient(circle at center,#111133,#050510);
+}
+#ui{
+    position:absolute;
+    top:10px;
+    left:10px;
+    font-size:22px;
+}
+</style>
+</head>
+<body>
+
+<div id="ui">
+Health: <span id="health">100</span><br>
+Score: <span id="score">0</span>
+</div>
+
+<canvas id="game"></canvas>
+
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+const healthUI=document.getElementById("health");
+const scoreUI=document.getElementById("score");
+
+let score=0;
+let keys={};
+let bullets=[];
+let phantoms=[];
+
+const player={
+    x:canvas.width/2,
+    y:canvas.height/2,
+    size:20,
+    speed:5,
+    health:100
+};
+
+let mouse={
+    x:0,
+    y:0
+};
+
+document.addEventListener("keydown",e=>keys[e.key.toLowerCase()]=true);
+document.addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
+
+canvas.addEventListener("mousemove",e=>{
+    mouse.x=e.clientX;
+    mouse.y=e.clientY;
+});
+let gameOver = false;
+canvas.addEventListener("click",shoot);
+
+function shoot(){
+    const angle=Math.atan2(
+        mouse.y-player.y,
+        mouse.x-player.x
+    );
+
+    bullets.push({
+        x:player.x,
+        y:player.y,
+        dx:Math.cos(angle)*10,
+        dy:Math.sin(angle)*10,
+        size:5
+    });
+}
+
+function spawnPhantom(){
+    let side=Math.floor(Math.random()*4);
+
+    let x,y;
+
+    if(side===0){
+        x=Math.random()*canvas.width;
+        y=-50;
+    }else if(side===1){
+        x=canvas.width+50;
+        y=Math.random()*canvas.height;
+    }else if(side===2){
+        x=Math.random()*canvas.width;
+        y=canvas.height+50;
+    }else{
+        x=-50;
+        y=Math.random()*canvas.height;
+    }
+
+    phantoms.push({
+        x,y,
+        size:25,
+        speed:1+Math.random()*2,
+        phase:Math.random()>0.5,
+        visible:true,
+        phaseTimer:0
+    });
+}
+
+setInterval(spawnPhantom,1200);
+
+function update(){
+    // Difficulty spike at 500 score
+let speedMultiplier = 1;
+let phaseMultiplier = 1;
+
+if (score >= 500) {
+    speedMultiplier = 2;      // phantoms move twice as fast
+    phaseMultiplier = 2;      // phase twice as often
+}
+
+    if(keys["w"]) player.y-=player.speed;
+    if(keys["s"]) player.y+=player.speed;
+    if(keys["a"]) player.x-=player.speed;
+    if(keys["d"]) player.x+=player.speed;
+
+    player.x=Math.max(0,Math.min(canvas.width,player.x));
+    player.y=Math.max(0,Math.min(canvas.height,player.y));
+
+    bullets.forEach((b,index)=>{
+        b.x+=b.dx;
+        b.y+=b.dy;
+
+        if(
+            b.x<0||b.x>canvas.width||
+            b.y<0||b.y>canvas.height
+        ){
+            bullets.splice(index,1);
+        }
+    });
+
+    phantoms.forEach((p,pIndex)=>{
+
+        let angle=Math.atan2(
+            player.y-p.y,
+            player.x-p.x
+        );
+
+        p.x += Math.cos(angle) * p.speed * speedMultiplier;
+p.y += Math.sin(angle) * p.speed * speedMultiplier;
+
+        if(p.phase){
+           p.phaseTimer += phaseMultiplier;
+
+if (p.phaseTimer > 120) {
+    p.visible = !p.visible;
+    p.phaseTimer = 0;
+}
+
+        }
+
+        bullets.forEach((b,bIndex)=>{
+
+            let dx=b.x-p.x;
+            let dy=b.y-p.y;
+
+            let dist=Math.sqrt(dx*dx+dy*dy);
+
+            if(dist<p.size+b.size && p.visible){
+
+                bullets.splice(bIndex,1);
+                phantoms.splice(pIndex,1);
+
+                score+=10;
+                scoreUI.textContent=score;
+            }
+        });
+
+        let dx=player.x-p.x;
+        let dy=player.y-p.y;
+
+        if(Math.sqrt(dx*dx+dy*dy)<player.size+p.size){
+
+            player.health-=0.2;
+            healthUI.textContent=Math.floor(player.health);
+
+            if (player.health <= 0 && !gameOver) {
+                gameOver = true;
+                document.getElementById("finalScore").textContent = "Score: " + score;
+                document.getElementById("gameOverScreen").style.display = "block";
+            }
+        }
+    });
+if(gameOver) return;
+function draw(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+function restartGame(){
+
+    score = 0;
+    scoreUI.textContent = score;
+
+    player.health = 100;
+    healthUI.textContent = player.health;
+
+    player.x = canvas.width/2;
+    player.y = canvas.height/2;
+
+    bullets = [];
+    phantoms = [];
+
+    gameOver = false;
+
+    document.getElementById("gameOverScreen").style.display = "none";
+}
+
+function goHome(){
+
+    document.getElementById("gameOverScreen").style.display = "none";
+
+    score = 0;
+    scoreUI.textContent = score;
+
+    player.health = 100;
+    healthUI.textContent = player.health;
+
+    bullets = [];
+    phantoms = [];
+
+    player.x = canvas.width/2;
+    player.y = canvas.height/2;
+}
+    // player
+    ctx.save();
+            }
+        }
+    ;
+if(player.health <= 0 && !gameOver){
+
+    gameOver = true;
+
+    document.getElementById("finalScore").textContent =
+        "Score: " + score;
+
+    document.getElementById("gameOverScreen").style.display =
+        "flex";
+}
+function draw(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // player
+    ctx.save();
+
+    let angle=Math.atan2(
+        mouse.y-player.y,
+        mouse.x-player.x
+    );
+
+    ctx.translate(player.x,player.y);
+    ctx.rotate(angle);
+
+    ctx.fillStyle="cyan";
+    ctx.beginPath();
+    ctx.moveTo(25,0);
+    ctx.lineTo(-15,-12);
+    ctx.lineTo(-15,12);
+    ctx.fill();
+
+    ctx.restore();
+
+    // bullets
+    ctx.fillStyle="yellow";
+
+    bullets.forEach(b=>{
+        ctx.beginPath();
+        ctx.arc(b.x,b.y,b.size,0,Math.PI*2);
+        ctx.fill();
+    });
+
+    // phantoms
+    phantoms.forEach(p=>{
+
+        if(!p.visible){
+            ctx.globalAlpha=0.15;
+        }else{
+            ctx.globalAlpha=1;
+        }
+
+        ctx.fillStyle="#aa66ff";
+
+        ctx.beginPath();
+        ctx.arc(
+            p.x,
+            p.y,
+            p.size,
+            0,
+            Math.PI*2
+        );
+        ctx.fill();
+
+        ctx.fillStyle="white";
+        ctx.beginPath();
+        ctx.arc(p.x-8,p.y-5,3,0,Math.PI*2);
+        ctx.arc(p.x+8,p.y-5,3,0,Math.PI*2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.strokeStyle="white";
+        ctx.arc(p.x,p.y+3,8,0,Math.PI);
+        ctx.stroke();
+
+        ctx.globalAlpha=1;
+    });
+}
+
+function gameLoop(){
+
+    update();
+    draw();
+
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+
+window.addEventListener("resize",()=>{
+    canvas.width=window.innerWidth;
+    canvas.height=window.innerHeight;
+});
+</script>
+
+</body>
+</html>
